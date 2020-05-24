@@ -139,9 +139,9 @@ public class Application {
             JSONArray coord = (JSONArray) coordinates.get(i);
             double x = (Double) coord.get(0);
             double y = (Double) coord.get(1);
-            result += x + "," + y;
-            //if (i != coordinates.size() - 1) // pas nécessaire?
-             //   result += " ";
+            result += x + "," + y + " ";
+            //if (i != coordinates.size() - 1)
+            //    result += " ";
         }
         return result;
     }
