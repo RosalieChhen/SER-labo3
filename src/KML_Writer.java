@@ -10,9 +10,6 @@ import java.util.List;
 
 public class KML_Writer {
 
-
-    String[] propertiesName = {"ADMIN", "ISO_A3"}; // TODO voir foreach on map java
-
     final static String NORMAL_STYLE = "normalStyle";
     final static String HIGHLIGHT_STYLE = "highlightStyle";
     final static String STYLEMAP = "labo3Style";
@@ -48,10 +45,10 @@ public class KML_Writer {
 
                 // ------------------ properties ------------------
                 Element extendedData = new Element("ExtendedData");
-                for(int j = 0; j < feature.getProperties().size(); j++){
+                for(int j = 0; j < feature.getPropertiesValues().size(); j++){
 
-                    Element data = new Element("Data").setAttribute(new Attribute("name", propertiesName[j]));
-                    Element value = new Element("value").addContent(feature.getProperties().get(j));
+                    Element data = new Element("Data").setAttribute(new Attribute("name", feature.getPropertiesKey().get(j)));
+                    Element value = new Element("value").addContent(feature.getPropertiesValues().get(j));
                     data.addContent(value);
                     extendedData.addContent(data);
 
