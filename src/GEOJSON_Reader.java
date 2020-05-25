@@ -11,7 +11,7 @@ import org.json.simple.parser.ParseException;
 
 public class GEOJSON_Reader {
 
-    String[] propertiesName = {"ADMIN", "ISO_A3"}; // ?? voir foreach map
+    String[] propertiesName = {"ADMIN", "ISO_A3"};  // TODO voir foreach on map java
 
     List<Feature> parseFile(String fileToReadPath) {
 
@@ -40,6 +40,9 @@ public class GEOJSON_Reader {
                 // Récupération des coordonnées d'une geometry d'une feature
                 JSONArray coordinatesJson = (JSONArray) geometryJson.get("coordinates");
 
+                // TODO régler ce" "if Polygon, if MultiPolygon..." voir rfc geojson : "GeoJSON supports the following geometry types:
+                //   Point, LineString, Polygon, MultiPoint, MultiLineString,
+                //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
                 Geometry geometry = null;
                 if(typeGeometry.equals("Polygon")){
                     String coordinates = getPolygonCoordinates(coordinatesJson);

@@ -10,7 +10,8 @@ import java.util.List;
 
 public class KML_Writer {
 
-    String[] propertiesName = {"ADMIN", "ISO_A3"}; // ?? voir foreach on map java
+
+    String[] propertiesName = {"ADMIN", "ISO_A3"}; // TODO voir foreach on map java
 
     final static String NORMAL_STYLE = "normalStyle";
     final static String HIGHLIGHT_STYLE = "highlightStyle";
@@ -59,6 +60,10 @@ public class KML_Writer {
                 placemark.addContent(extendedData);
 
                 // ------------------ geometry ------------------
+
+                // TODO régler ce" "if Polygon, if MultiPolygon..." voir rfc geojson : "GeoJSON supports the following geometry types:
+                //   Point, LineString, Polygon, MultiPoint, MultiLineString,
+                //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
                 if(feature.getGeometry().getClass().getName().equals("Polygon")){
                     placemark.addContent(createPolygonElement(((Polygon) feature.getGeometry()).getCoordinates()));
 
