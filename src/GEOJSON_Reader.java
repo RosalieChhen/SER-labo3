@@ -77,7 +77,7 @@ public class GEOJSON_Reader {
         for (Object propertyKey : propertiesKeysSet)
             propertiesKeysList.add((String) propertyKey);
 
-        // TODO set ne met dnas le même ordre que dans le geojson file
+        // TODO set ne se met pas dans le même ordre que dans le geojson file
         // geojson : ADMIN : ... , ISO_A3 : ...
         // setKey method : ISO_A3 : ..., ADMIN : ...
         // du coup j'inverse l'ordre ici pour rendre identique...
@@ -95,7 +95,6 @@ public class GEOJSON_Reader {
             propertiesStringList.add((String) propertiesGesojon.get(propertyKey));
         }
 
-        int i = 0;
         return propertiesStringList;
     }
 

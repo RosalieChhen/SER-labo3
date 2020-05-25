@@ -62,17 +62,12 @@ public class KML_Writer {
                 //   Point, LineString, Polygon, MultiPoint, MultiLineString,
                 //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
                 if(feature.getGeometry().getClass().getName().equals("Polygon")){
+
                     placemark.addContent(createPolygonElement(((Polygon) feature.getGeometry()).getCoordinates()));
 
                 } else if (feature.getGeometry().getClass().getName().equals("MultiPolygon")){
 
-                    Element multiGeometry = new Element("MultiGeometry");
-
-                    List<String> coordinates = ((MultiPolygon) feature.getGeometry()).getCoordinates();
-                    for(int j = 0; j < coordinates.size(); j++){
-                        multiGeometry.addContent(createPolygonElement(coordinates.get(j)));
-                    }
-                    placemark.addContent(multiGeometry);
+                    placemark.addContent(createMultiPolygonElement(((MultiPolygon) feature.getGeometry()).getCoordinates()));
                 }
 
                 document.getRootElement().addContent(placemark);
@@ -90,12 +85,23 @@ public class KML_Writer {
         }
     }
 
-    // Écriture d'un element polygon
+    // Écriture d'un element Polygon
     private static Element createPolygonElement(String coordinatesString){
         Element coordinates = new Element("coordinates").addContent(coordinatesString);
         Element linearRing = new Element("LinearRing").addContent(coordinates);
         Element outerBoundaryIs = new Element("outerBoundaryIs").addContent(linearRing);
         return new Element("Polygon").addContent(outerBoundaryIs);
+    }
+
+    // Écriture d'un element MultiPolygon
+    private static Element createMultiPolygonElement(List<String> coordinatesStringList){
+        Element multiGeometry = new Element("MultiGeometry");
+
+        for(int j = 0; j < coordinatesStringList.size(); j++){
+            multiGeometry.addContent(createPolygonElement(coordinatesStringList.get(j)));
+        }
+
+        return multiGeometry;
     }
 
     // create a sytle (besoin de deux style pour un element StyleMap)
