@@ -1,10 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,9 +29,10 @@ public class GEOJSON_Reader {
                 JSONObject featureJson = (JSONObject) featuresArray.get(featureIndex);
 
                 // Récupération des keys des propriétés d'une feature
-                List<String> propertiesKeys = getPropertiesKeys(featureJson);
+                //List<String> propertiesKeys = getPropertiesKeys(featureJson);
                 // Récupération des valeurs des propriétés d'une feature
-                List<String> propertiesValues = getPropertiesValues(featureJson);
+                //List<String> propertiesValues = getPropertiesValues(featureJson);
+                Map<String, String> properties = getProperties(featureJson);
 
                 // Récupération du type de geometry d'une feature
                 JSONObject geometryJson = (JSONObject) featureJson.get("geometry");
@@ -56,7 +54,7 @@ public class GEOJSON_Reader {
                 }
 
                 // Creation de la feature
-                Feature feature = new Feature(propertiesKeys, propertiesValues, geometry);
+                Feature feature = new Feature(properties, geometry);
                 featuresCollection.add(feature);
             }
 
@@ -67,35 +65,23 @@ public class GEOJSON_Reader {
         return featuresCollection;
     }
 
-    // Récupère les noms des propriétés (keys) sous la forme d'une Liste de String
-    private List<String> getPropertiesKeys(JSONObject feature){
+    private Map<String, String> getProperties(JSONObject feature){
+
+        Map<String, String> properties = new HashMap<>();
         JSONObject propertiesGesojon = (JSONObject) feature.get("properties");
 
+        // Récupère les clés des propriétés d'une feature et les mets dans le bon ordre
         Set propertiesKeysSet = propertiesGesojon.keySet();
         List<String> propertiesKeysList = new ArrayList<String>();
-
         for (Object propertyKey : propertiesKeysSet)
             propertiesKeysList.add((String) propertyKey);
-
-        // TODO set ne se met pas dans le même ordre que dans le geojson file
-        // geojson : ADMIN : ... , ISO_A3 : ...
-        // setKey method : ISO_A3 : ..., ADMIN : ...
-        // du coup j'inverse l'ordre ici pour rendre identique...
         reverse(propertiesKeysList);
 
-        return propertiesKeysList;
-    }
+        // Ajoute à la map les clés et les valeurs d'une prorpriétés d'une feature
+        for (Object propertyKey : propertiesKeysList)
+            properties.put((String) propertyKey,(String) propertiesGesojon.get(propertyKey));
 
-    private List<String> getPropertiesValues(JSONObject feature) {
-
-        List<String> propertiesStringList = new ArrayList<>();
-        JSONObject propertiesGesojon = (JSONObject) feature.get("properties");
-
-        for (Object propertyKey : getPropertiesKeys(feature)) {
-            propertiesStringList.add((String) propertiesGesojon.get(propertyKey));
-        }
-
-        return propertiesStringList;
+        return properties;
     }
 
     private String getCoordinatesPair(JSONArray pair){

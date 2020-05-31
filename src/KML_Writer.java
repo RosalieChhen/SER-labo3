@@ -7,6 +7,7 @@ import org.jdom2.output.XMLOutputter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class KML_Writer {
 
@@ -15,9 +16,9 @@ public class KML_Writer {
     final static String STYLEMAP = "labo3Style";
 
     void writeKMLFile(String outputPath, List<Feature> featuresCollection) {
-        // Création du document kml
         try {
 
+            // Création du document kml
             Element root = new Element("Document");
             Document document = new Document(root);
 
@@ -45,19 +46,17 @@ public class KML_Writer {
 
                 // ------------------ properties ------------------
                 Element extendedData = new Element("ExtendedData");
-                for(int j = 0; j < feature.getPropertiesValues().size(); j++){
-
-                    Element data = new Element("Data").setAttribute(new Attribute("name", feature.getPropertiesKey().get(j)));
-                    Element value = new Element("value").addContent(feature.getPropertiesValues().get(j));
+                Map<String, String> properties = feature.getProperties();
+                for (Map.Entry<String, String> property : properties.entrySet()) {
+                    Element data = new Element("Data").setAttribute(new Attribute("name", property.getKey()));
+                    Element value = new Element("value").addContent(property.getValue());
                     data.addContent(value);
                     extendedData.addContent(data);
-
                 }
 
                 placemark.addContent(extendedData);
 
                 // ------------------ geometry ------------------
-
                 // TODO régler ce" "if Polygon, if MultiPolygon..." voir rfc geojson : "GeoJSON supports the following geometry types:
                 //   Point, LineString, Polygon, MultiPoint, MultiLineString,
                 //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
@@ -78,7 +77,7 @@ public class KML_Writer {
             xmlOutputer.setFormat(Format.getPrettyFormat());
             xmlOutputer.output(document, new FileWriter(outputPath));
 
-            System.out.println("XML File was created successfully!");
+            System.out.println("KML File was created successfully!");
 
         } catch (IOException e){
             System.out.println(e.getMessage());

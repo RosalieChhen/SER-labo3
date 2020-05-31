@@ -1,26 +1,19 @@
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Feature {
 
-    private List<String> propertiesKey;
-    private List<String> propertiesValues;
+    private Map<String, String> properties;
     private Geometry geometry;
     private String name;
 
-    public Feature(List<String> propertiesKey, List<String> propertiesValues, Geometry geometry){
-        this.propertiesKey = propertiesKey;
-        this.propertiesValues = propertiesValues;
+    public Feature(Map<String, String> properties, Geometry geometry){
+        this.properties = properties;
         this.geometry = geometry;
-        this.name = propertiesValues.get(1); //....TO FIX
+        this.name = properties.get("ADMIN");
     }
 
-    public List<String> getPropertiesKey(){
-        return propertiesKey;
-    }
-
-    public List<String> getPropertiesValues(){
-        return propertiesValues;
+    public Map<String, String> getProperties(){
+        return properties;
     }
 
     public Geometry getGeometry() {
