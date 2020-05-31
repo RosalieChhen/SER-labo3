@@ -57,17 +57,8 @@ public class KML_Writer {
                 placemark.addContent(extendedData);
 
                 // ------------------ geometry ------------------
-                // TODO régler ce" "if Polygon, if MultiPolygon..." voir rfc geojson : "GeoJSON supports the following geometry types:
-                //   Point, LineString, Polygon, MultiPoint, MultiLineString,
-                //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
-                if(feature.getGeometry().getClass().getName().equals("Polygon")){
 
-                    placemark.addContent(createPolygonElement(((Polygon) feature.getGeometry()).getCoordinates()));
-
-                } else if (feature.getGeometry().getClass().getName().equals("MultiPolygon")){
-
-                    placemark.addContent(createMultiPolygonElement(((MultiPolygon) feature.getGeometry()).getCoordinates()));
-                }
+                placemark.addContent(feature.getGeometry().toKML());
 
                 document.getRootElement().addContent(placemark);
 
@@ -82,25 +73,6 @@ public class KML_Writer {
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-    }
-
-    // Écriture d'un element Polygon
-    private static Element createPolygonElement(String coordinatesString){
-        Element coordinates = new Element("coordinates").addContent(coordinatesString);
-        Element linearRing = new Element("LinearRing").addContent(coordinates);
-        Element outerBoundaryIs = new Element("outerBoundaryIs").addContent(linearRing);
-        return new Element("Polygon").addContent(outerBoundaryIs);
-    }
-
-    // Écriture d'un element MultiPolygon
-    private static Element createMultiPolygonElement(List<String> coordinatesStringList){
-        Element multiGeometry = new Element("MultiGeometry");
-
-        for(int j = 0; j < coordinatesStringList.size(); j++){
-            multiGeometry.addContent(createPolygonElement(coordinatesStringList.get(j)));
-        }
-
-        return multiGeometry;
     }
 
     // create a sytle (besoin de deux style pour un element StyleMap)

@@ -1,3 +1,5 @@
-abstract public class Geometry { // TODO c'est ok cette abstraction ????
-    public Geometry(){}
+import org.jdom2.Element;
+
+interface Geometry {
+    public Element toKML();
 }

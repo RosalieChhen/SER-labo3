@@ -10,9 +10,16 @@ import org.json.simple.parser.ParseException;
 
 import static java.util.Collections.reverse;
 
+class UnexpectedDataException extends RuntimeException{
+    UnexpectedDataException(String msg)
+    {
+        super(msg);
+    }
+}
+
 public class GEOJSON_Reader {
 
-    List<Feature> parseFile(String fileToReadPath) {
+    List<Feature> parseFile(String fileToReadPath){
 
         JSONParser jsonParser = new JSONParser();
         List<Feature> featuresCollection = new ArrayList<>();
@@ -41,31 +48,37 @@ public class GEOJSON_Reader {
                 // Récupération des coordonnées d'une geometry d'une feature
                 JSONArray coordinatesJson = (JSONArray) geometryJson.get("coordinates");
 
-                // TODO régler ce" "if Polygon, if MultiPolygon..." voir rfc geojson : "GeoJSON supports the following geometry types:
-                //   Point, LineString, Polygon, MultiPoint, MultiLineString,
-                //   MultiPolygon, and GeometryCollection" dans ce labo, il y a que Polygon et MultiPolygon
                 Geometry geometry = null;
-                if(typeGeometry.equals("Polygon")){
-                    String coordinates = getPolygonCoordinates(coordinatesJson);
-                    geometry = new Polygon(coordinates);
-                } else if (typeGeometry.equals("MultiPolygon")){
-                    List<String> coordinates = getMultiPolygonCoordinates(coordinatesJson);
-                    geometry = new MultiPolygon(coordinates);
+                try{
+                    switch(typeGeometry)
+                    {
+                        case "Polygon":
+                            geometry = new Polygon(getPolygonCoordinates(coordinatesJson));
+                            break;
+                        case "MultiPolygon":
+                            geometry = new MultiPolygon(getMultiPolygonCoordinates(coordinatesJson));
+                            break;
+                        default :
+                            throw new UnexpectedDataException("Unexpected Geometry type");
+                    }
+                    // Creation de la feature
+                    Feature feature = new Feature(properties, geometry);
+                    featuresCollection.add(feature);
                 }
 
-                // Creation de la feature
-                Feature feature = new Feature(properties, geometry);
-                featuresCollection.add(feature);
+                catch(UnexpectedDataException e) {
+                    e.printStackTrace();
+                }
             }
 
-        } catch (ParseException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return featuresCollection;
     }
 
-    private Map<String, String> getProperties(JSONObject feature){
+    private Map<String, String> getProperties(JSONObject feature) throws UnexpectedDataException{
 
         Map<String, String> properties = new HashMap<>();
         JSONObject propertiesGesojon = (JSONObject) feature.get("properties");
@@ -81,6 +94,19 @@ public class GEOJSON_Reader {
         for (Object propertyKey : propertiesKeysList)
             properties.put((String) propertyKey,(String) propertiesGesojon.get(propertyKey));
 
+        //On s'assure que les éléments "ADMIN" et "ISO_A3" soient bien présents
+        String name = properties.get("ADMIN");
+        String id = properties.get("ISO_A3");
+
+        if(id == null)
+        {
+            throw new UnexpectedDataException("No ISO_A3 (id) property");
+        }
+        if(name == null)
+        {
+            throw new UnexpectedDataException("No ADMIN (name) property");
+        }
+        System.out.println("("+id+") "+name);
         return properties;
     }
 
@@ -96,14 +122,15 @@ public class GEOJSON_Reader {
     private String getPolygonCoordinates(JSONArray polygon){
 
         String coordinatesString = "";
-        // On récupère un tableau de pairs de coordonées (x,y)
+        // On récupère un tableau de paires de coordonées (x,y)
         JSONArray coordinatesGeojson = (JSONArray) polygon.get(0);
 
-        // Pour chaque pair, on récupère les coordonnées x et y qu'on ajoute au résultat
+        // Pour chaque paire, on récupère les coordonnées x et y qu'on ajoute au résultat
         for (int i = 0; i < coordinatesGeojson.size(); i++) {
             JSONArray coord = (JSONArray) coordinatesGeojson.get(i);
             coordinatesString += getCoordinatesPair(coord);
         }
+        System.out.println("     - "+coordinatesGeojson.size()+" coordinates");
         return coordinatesString;
     }
 
